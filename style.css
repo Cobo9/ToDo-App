@@ -80,6 +80,14 @@ body{
 
 .todolist__list__item__text{
     font-size: 1.5rem;
+    width: 170px;
+    border: none;
+    background: transparent;
+    outline: none;
+}
+.todolist__list__item__text:disabled{
+    color: black;
+    
 }
 
 .todolist__list__item__buttons{

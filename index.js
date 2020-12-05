@@ -5,7 +5,7 @@ const todoInput = document.querySelector(".todolist__form__input");
 const todoButton = document.querySelector(".todolist__form__button");
 const todoList = document.querySelector(".todolist__list");
 todoForm.addEventListener("submit", submitForm);
-
+let editMode = false;
 
 
 function submitForm (e){
@@ -20,6 +20,7 @@ function addTask (text){
     const task = {
         name: text,
         id: taskId,
+        disableInput: true,
     }
     tasks.push(task);
     renderTodo();
@@ -32,51 +33,38 @@ function removeItem(id){
     renderTodo()
 }
 
+function editItem (btn){
 
-
-function editItem(id){
-
-    // First we need to find the element in the array of tasks
     let tasksArray = [...tasks];
-    const elementToEdit = tasksArray.find(item=> item.id == id.dataset.key)
-
-    //prepare the input field and button, input field takes the value of the text on the item in the array.
-    todoInput.value = elementToEdit.name;
-    todoButton.textContent="Edit";
-
-    //now the user can edit their task in the input field
-    //we need to remove the submit event listener from the form, and add a different 
-    //one to fetch the input value and change the textContent of task;
-    todoForm.removeEventListener("submit", submitForm);
-    todoForm.addEventListener("submit", (e)=>fetchValue(e,todoInput.value, elementToEdit));
 
 
-}
+    const elementToEdit = tasksArray.find(item=> item.id == btn.dataset.key);
+    const elementToEditInput = [...document.querySelectorAll(".todolist__list__item__text")]
+    
+
+
+    const element = elementToEditInput.find(item=>btn.dataset.key == item.dataset.key);
+
+
+    elementToEdit.name = element.value;
 
 
 
-function fetchValue (e,todoInputValue, elementToEdit){
-    ///first we block the refresher
-    e.preventDefault()
-    //second we alter the name of the element in the array to the one that user wrote
-    elementToEdit.name = todoInputValue;
 
-    //restore the button and the input field to default behavior
-    todoInput.value = "";
-    todoButton.textContent="Submit";
+    elementToEdit.disableInput = !elementToEdit.disableInput;
 
-    //we need to restore the listeners to their default behaviour
-    todoForm.removeEventListener("submit", (e)=>fetchValue(e,todoInput.value, elementToEdit));
-    todoForm.addEventListener("submit", submitForm);
-    //render of the newly altered list
+
+
+
     renderTodo();
 }
+
 
 
 function renderTodo(){
     todoList.innerHTML="";
 
-    tasks.forEach(item=> {
+    tasks.forEach(task=> {
 
         const input = document.createElement("input");
         input.classList.add("todolist__list__item__button");
@@ -88,7 +76,7 @@ function renderTodo(){
         const editBtn = document.createElement("button")
         editBtn.classList.add("todolist__list__item__button");
         editBtn.classList.add("todolist__list__item__button--edit");
-        editBtn.setAttribute("data-key", `${item.id}`);
+        editBtn.setAttribute("data-key", `${task.id}`);
         editBtn.appendChild(editIcon)
 
         const deleteIcon = document.createElement("i")
@@ -97,7 +85,7 @@ function renderTodo(){
         const deleteBtn = document.createElement("button")
         deleteBtn.classList.add("todolist__list__item__button");
         deleteBtn.classList.add("todolist__list__item__button--delete");
-        deleteBtn.setAttribute("data-key", `${item.id}`);
+        deleteBtn.setAttribute("data-key", `${task.id}`);
         deleteBtn.appendChild(deleteIcon);
 
         const itemBtns = document.createElement("div")
@@ -106,22 +94,28 @@ function renderTodo(){
         itemBtns.appendChild(editBtn);
         itemBtns.appendChild(input);
 
-        const textSpan = document.createElement("span");
-        textSpan.classList.add("todolist__list__item__text");
-        textSpan.textContent = item.name;
+        const textInput = document.createElement("input");
+        textInput.classList.add("todolist__list__item__text");
+        textInput.setAttribute("data-key", `${task.id}`);
+        //check if editable 
+        if(task.disableInput){
+            textInput.setAttribute("disabled", true);
+        }
+        textInput.value = task.name;
 
         const liItem = document.createElement("li");
         liItem.classList.add("todolist__list__item");
-        liItem.appendChild(textSpan);
+        liItem.setAttribute("data-key", `${task.id}`);
+        liItem.appendChild(textInput);
         liItem.appendChild(itemBtns);
         todoList.appendChild(liItem)
     })
 
     const removeBtns = document.querySelectorAll(".todolist__list__item__button--delete");
-    removeBtns.forEach(item => item.addEventListener("click", ()=>{removeItem(item)}));
+    removeBtns.forEach(btn => btn.addEventListener("click", ()=>{removeItem(btn)}));
 
     const editBtns = document.querySelectorAll(".todolist__list__item__button--edit");
-    editBtns.forEach(item => item.addEventListener("click", ()=>{editItem(item)}));
+    editBtns.forEach(btn => btn.addEventListener("click", ()=>{editItem(btn)}));
 }
 
 
