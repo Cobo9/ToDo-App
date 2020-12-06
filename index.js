@@ -34,28 +34,12 @@ function removeItem(id){
 }
 
 function editItem (btn){
-
     let tasksArray = [...tasks];
-
-
     const elementToEdit = tasksArray.find(item=> item.id == btn.dataset.key);
     const elementToEditInput = [...document.querySelectorAll(".todolist__list__item__text")]
-    
-
-
     const element = elementToEditInput.find(item=>btn.dataset.key == item.dataset.key);
-
-
     elementToEdit.name = element.value;
-
-
-
-
     elementToEdit.disableInput = !elementToEdit.disableInput;
-
-
-
-
     renderTodo();
 }
 
@@ -72,11 +56,20 @@ function renderTodo(){
         
         const editIcon = document.createElement("i");
         editIcon.setAttribute("class","fas fa-pencil-alt fa-2x");
+        //If the input is being edited we change the edit icon to tick
+        if(task.disableInput === false ){
+            editIcon.setAttribute("class", "fas fa-check fa-2x");
+        }
 
         const editBtn = document.createElement("button")
         editBtn.classList.add("todolist__list__item__button");
         editBtn.classList.add("todolist__list__item__button--edit");
         editBtn.setAttribute("data-key", `${task.id}`);
+        //If the input is being edited we change the color of the button to blue
+        if(task.disableInput === false ){
+            editBtn.style.backgroundColor ="#5FC9F8";
+        }
+
         editBtn.appendChild(editIcon)
 
         const deleteIcon = document.createElement("i")
@@ -97,7 +90,7 @@ function renderTodo(){
         const textInput = document.createElement("input");
         textInput.classList.add("todolist__list__item__text");
         textInput.setAttribute("data-key", `${task.id}`);
-        //check if editable 
+        //If the disable input property in the object is set to true we disable the editability of the input
         if(task.disableInput){
             textInput.setAttribute("disabled", true);
         }
@@ -106,6 +99,10 @@ function renderTodo(){
         const liItem = document.createElement("li");
         liItem.classList.add("todolist__list__item");
         liItem.setAttribute("data-key", `${task.id}`);
+        if(task.disableInput === false){
+            liItem.style.backgroundColor ="#DFDED4";
+        }
+
         liItem.appendChild(textInput);
         liItem.appendChild(itemBtns);
         todoList.appendChild(liItem)
